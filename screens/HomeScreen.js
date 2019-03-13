@@ -30,7 +30,7 @@ const styles = StyleSheet.create({
   },
   flatlist: {
     height: "100%",
-    margin: 20 // PIXEL RATIO??? <<<<==========
+    margin: 20 
   },
   item: {
     alignItems: "center",
@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
     margin: 4,
     justifyContent: "center",
     alignItems: "center",
-    height: 100, //PUT PIXEL RATIO!!!!!! <<=====================
+    height: 100,
     borderRadius: 4
   },
   emptyItem: {
