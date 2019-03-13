@@ -133,7 +133,7 @@ const getItemState = name => {
 };
 
 export default class HomeScreen extends React.Component {
-  static navigationOptions = {
+  static navigationOptions = ({ navigation }) => ({
     headerTitle: "COMPANY NAME",
     headerTitleStyle: {
       textAlign: "center",
@@ -151,21 +151,29 @@ export default class HomeScreen extends React.Component {
     headerRight: (
       <TouchableOpacity
         style={styles.headerButton}
-        onPress={() => alert("info")}
+        onPress={() =>
+          navigation.setParams({
+            editing: !navigation.state.params.editing
+          })
+        }
       >
-        <Text style={styles.headerText}>Edit</Text>
+        <Text style={styles.headerText}>
+          {navigation.state.params && navigation.state.params.editing
+            ? "Save"
+            : "Edit"}
+        </Text>
       </TouchableOpacity>
     )
-  };
+  });
 
   state = {
     data: [
       { id: "00", name: "" },
-      { id: "01", name: "PANCAAAKE" },
+      { id: "01", name: "" },
       { id: "02", name: "" },
       { id: "03", name: "" },
-      { id: "04", name: "FRIDAYYY" },
-      { id: "05", name: "JASOOOON" },
+      { id: "04", name: "" },
+      { id: "05", name: "" },
       { id: "06", name: "" },
       { id: "07", name: "" },
       { id: "08", name: "" },
@@ -178,6 +186,19 @@ export default class HomeScreen extends React.Component {
     textToAdd: "",
     itemToEdit: null
   };
+
+  componentDidMount() {
+    this.props.navigation.setParams({
+      editing: false
+    });
+    console.log(this.props);
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    return (
+      this.props != prevProps && this.setState({ editing: !prevState.editing })
+    );
+  }
 
   toggleModal = (index = null) =>
     this.setState({
@@ -223,6 +244,17 @@ export default class HomeScreen extends React.Component {
     </Modal>
   );
 
+  isEditing = () => {
+    if (
+      this.props.navigation.state &&
+      this.props.navigation.state.params &&
+      this.props.navigation.state.params.editing
+    ) {
+      return this.props.navigation.state.params.editing;
+    }
+    return false;
+  };
+
   render() {
     const columns = 3;
     const { editing, isModalVisible } = this.state;
@@ -232,6 +264,7 @@ export default class HomeScreen extends React.Component {
           {this.modalComponent()}
           <FlatList
             data={this.state.data}
+            extraData={editing}
             style={styles.flatlist}
             keyExtractor={item => item.id}
             numColumns={columns}
