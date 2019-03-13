@@ -10,12 +10,11 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
-import { Col, Row, Grid } from "react-native-easy-grid";
-import Box from "app/components/Box";
 
-import { WebBrowser, Icon } from "expo";
+import Modal from "react-native-modal";
+import FormModal from "app/components/FormModal";
 
-import { MonoText } from "../components/StyledText";
+import { Icon } from "expo";
 
 const styles = StyleSheet.create({
   container: {
@@ -44,6 +43,9 @@ const styles = StyleSheet.create({
   emptyItem: {
     backgroundColor: "#4b5289"
   },
+  deleteItem: {
+    backgroundColor: "#4b5289"
+  },
   mainItem: {
     backgroundColor: "#75f1c1"
   },
@@ -68,6 +70,16 @@ const styles = StyleSheet.create({
     marginBottom: 0,
     color: "#fff",
     fontSize: 12
+  },
+  modal: {
+    flex: 1,
+    padding: 20,
+    borderRadius: 8,
+    backgroundColor: "#fff"
+  },
+  modalText: {
+    textAlign: "center",
+    fontSize: 20
   }
 });
 
@@ -146,28 +158,45 @@ export default class HomeScreen extends React.Component {
       { id: "10", name: "" },
       { id: "11", name: "" }
     ],
-    editing: false
+    editing: true,
+    isModalVisible: false
   };
+
+  toggleModal = () =>
+    this.setState({ isModalVisible: !this.state.isModalVisible });
+
+  modalComponent = () => (
+    <Modal isVisible={this.state.isModalVisible}>
+      <View style={styles.modal}>
+        <Text style={styles.modalText}>Add a content to item!</Text>
+        <TouchableOpacity onPress={this.toggleModal}>
+          <Text>Hide me!</Text>
+        </TouchableOpacity>
+      </View>
+    </Modal>
+  );
 
   render() {
     const columns = 3;
-    const { editing } = this.state;
+    const { editing, isModalVisible } = this.state;
     return (
       <SafeAreaView>
         <View style={styles.container}>
+          {this.modalComponent()}
           <FlatList
             data={this.state.data}
             style={styles.flatlist}
             keyExtractor={item => item.id}
             numColumns={columns}
-            renderItem={({ item }) => {
+            renderItem={({ item, index }) => {
               if (editing) {
                 return (
                   <TouchableOpacity
                     style={[
-                      item.name ? styles.mainItem : styles.editItem,
+                      item.name ? styles.deleteItem : styles.editItem,
                       styles.item
                     ]}
+                    onPress={() => this.toggleModal()}
                   >
                     {getIconItemState(item.name)}
                   </TouchableOpacity>
