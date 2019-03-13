@@ -9,7 +9,9 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View
+  View,
+  TextInput,
+  Button
 } from "react-native";
 
 import Modal from "react-native-modal";
@@ -79,7 +81,20 @@ const styles = StyleSheet.create({
   },
   modalText: {
     textAlign: "center",
-    fontSize: 20
+    fontSize: 20,
+    marginVertical: 20
+  },
+  textInput: {
+    height: 40,
+    borderColor: "gray",
+    borderWidth: 1,
+    borderRadius: 4,
+    paddingHorizontal: 10,
+    marginBottom: 10
+  },
+  cancelModal: {
+    marginTop: 10,
+    alignSelf: "center"
   }
 });
 
@@ -159,29 +174,50 @@ export default class HomeScreen extends React.Component {
       { id: "11", name: "" }
     ],
     editing: true,
-    isModalVisible: false
+    isModalVisible: false,
+    textToAdd: "",
+    itemToEdit: null
   };
 
-  toggleModal = () =>
-    this.setState({ isModalVisible: !this.state.isModalVisible });
+  toggleModal = (index = null) =>
+    this.setState({
+      isModalVisible: !this.state.isModalVisible,
+      itemToEdit: index
+    });
 
-  removeName = index => {
+  editName = (index, content = "") => {
     let newState = update(this.state, {
       data: {
         [index]: {
-          name: { $set: "" }
+          name: { $set: content }
         }
       }
     });
     this.setState(newState);
   };
 
+  addName = () => {
+    const { itemToEdit, textToAdd } = this.state;
+    if (!!textToAdd) {
+      this.editName(itemToEdit, textToAdd);
+      this.toggleModal();
+    } else alert("Invalid value");
+  };
+
   modalComponent = () => (
     <Modal isVisible={this.state.isModalVisible}>
       <View style={styles.modal}>
         <Text style={styles.modalText}>Add a content to item!</Text>
-        <TouchableOpacity onPress={this.toggleModal}>
-          <Text>Hide me!</Text>
+        <TextInput
+          autoFocus
+          maxLength={9}
+          placeholder="Add text here"
+          style={styles.textInput}
+          onChangeText={textToAdd => this.setState({ textToAdd })}
+        />
+        <Button title="Add Text" onPress={this.addName} />
+        <TouchableOpacity style={styles.cancelModal} onPress={this.toggleModal}>
+          <Text>Cancel</Text>
         </TouchableOpacity>
       </View>
     </Modal>
@@ -207,7 +243,9 @@ export default class HomeScreen extends React.Component {
                       item.name ? styles.deleteItem : styles.editItem,
                       styles.item
                     ]}
-                    onPress={() => this.removeName(index)}
+                    onPress={() =>
+                      item.name ? this.editName(index) : this.toggleModal(index)
+                    }
                   >
                     {getIconItemState(item.name)}
                   </TouchableOpacity>
