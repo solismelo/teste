@@ -1,4 +1,5 @@
 import React from "react";
+import update from "immutability-helper";
 import {
   FlatList,
   SafeAreaView,
@@ -12,7 +13,6 @@ import {
 } from "react-native";
 
 import Modal from "react-native-modal";
-import FormModal from "app/components/FormModal";
 
 import { Icon } from "expo";
 
@@ -165,6 +165,17 @@ export default class HomeScreen extends React.Component {
   toggleModal = () =>
     this.setState({ isModalVisible: !this.state.isModalVisible });
 
+  removeName = index => {
+    let newState = update(this.state, {
+      data: {
+        [index]: {
+          name: { $set: "" }
+        }
+      }
+    });
+    this.setState(newState);
+  };
+
   modalComponent = () => (
     <Modal isVisible={this.state.isModalVisible}>
       <View style={styles.modal}>
@@ -196,7 +207,7 @@ export default class HomeScreen extends React.Component {
                       item.name ? styles.deleteItem : styles.editItem,
                       styles.item
                     ]}
-                    onPress={() => this.toggleModal()}
+                    onPress={() => this.removeName(index)}
                   >
                     {getIconItemState(item.name)}
                   </TouchableOpacity>
